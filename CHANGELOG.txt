@@ -1,0 +1,3 @@
+0.0.1 - basic ioc
+0.0.2 - manage singleton
+0.0.3 - add event listener
