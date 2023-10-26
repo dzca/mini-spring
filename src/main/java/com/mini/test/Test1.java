@@ -1,5 +1,6 @@
 package com.mini.test;
 
+import com.mini.beans.BeansException;
 import com.mini.beans.NoSuchBeanDefinitionException;
 import com.mini.context.ClassPathXmlApplicationContext;
 import lombok.extern.java.Log;
@@ -7,7 +8,7 @@ import lombok.extern.java.Log;
 @Log
 public class Test1 {
 
-	public static void main(String[] args) throws NoSuchBeanDefinitionException {
+	public static void main(String[] args) throws BeansException {
 		log.info("running Test1");
 		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("appContext.xml");
 	    AService aService=(AService)ctx.getBean("aService");

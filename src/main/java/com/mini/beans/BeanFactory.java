@@ -1,8 +1,10 @@
 package com.mini.beans;
 
 public interface BeanFactory {
-    Object getBean(String beanName) throws NoSuchBeanDefinitionException;
+    Object getBean(String beanName) throws BeansException;
 
-    void registerBeanDefinition(BeanDefinition bd);
+    void registerBean(String beanName, Object obj);
+
+    boolean containsBean(String name);
 }
 

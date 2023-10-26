@@ -1,7 +1,5 @@
 package com.mini.beans;
 
-import lombok.Builder;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.lang.reflect.InvocationTargetException;
@@ -9,39 +7,47 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 @NoArgsConstructor
-public class SimpleBeanFactory implements BeanFactory{
-    private List<BeanDefinition> beanDefinitions=new ArrayList<>();
-    private List<String> beanNames=new ArrayList<>();
-    private Map<String, Object> singletons =new HashMap<>();
+public class SimpleBeanFactory extends DefaultSingletonBeanRegistry implements BeanFactory {
+    private final Map<String, BeanDefinition> beanDefinitions = new ConcurrentHashMap<>(256);
 
     @Override
-    public Object getBean(String beanName) throws NoSuchBeanDefinitionException {
-        Object singleton = singletons.get(beanName);
+    public Object getBean(String beanName) throws BeansException {
+        Object singleton = getSingleton(beanName);
         if (singleton == null) {
-            int i = beanNames.indexOf(beanName);
-            if (i == -1) {
-                throw new NoSuchBeanDefinitionException("Bean not defined");
+            BeanDefinition beanDefinition = beanDefinitions.get(beanName);
+
+            if(beanDefinition == null){
+                throw new BeansException("Bean not defined");
             }
-            else {
-                BeanDefinition bd = beanDefinitions.get(i);
-                try {
-                    singleton=Class.forName(bd.getClassName()).getDeclaredConstructor().newInstance();
-                } catch (InstantiationException | IllegalAccessException | ClassNotFoundException |
-                         NoSuchMethodException | InvocationTargetException e) {
-                    e.printStackTrace();
-                }
-                singletons.put(bd.getId(),singleton);
+
+            try {
+                singleton = Class.forName(beanDefinition.getClassName()).getDeclaredConstructor().newInstance();
+            } catch (InstantiationException | IllegalAccessException | ClassNotFoundException |
+                     NoSuchMethodException | InvocationTargetException e) {
+                e.printStackTrace();
             }
+
+            registerSingleton(beanName, singleton);
+
         }
         return singleton;
     }
 
     @Override
-    public void registerBeanDefinition(BeanDefinition bd) {
-        this.beanDefinitions.add(bd);
-        this.beanNames.add(bd.getId());
+    public void registerBean(String beanName, Object obj) {
+        registerSingleton(beanName, obj);
+    }
+
+    @Override
+    public boolean containsBean(String name) {
+        return containsSingleton(name);
+    }
+
+    public void registerBeanDefinition(BeanDefinition beanDefinition) {
+        this.beanDefinitions.put(beanDefinition.getId(), beanDefinition);
     }
 }

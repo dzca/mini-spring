@@ -9,19 +9,24 @@ public class ClassPathXmlApplicationContext implements BeanFactory{
 
     public ClassPathXmlApplicationContext(String fileName){
         Resource res = new ClassPathXmlResource(fileName);
-        BeanFactory bf = new SimpleBeanFactory();
+        SimpleBeanFactory bf = new SimpleBeanFactory();
         XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(bf);
         reader.loadBeanDefinitions(res);
         this.beanFactory = bf;
     }
 
     @Override
-    public Object getBean(String beanName) throws NoSuchBeanDefinitionException {
+    public Object getBean(String beanName) throws BeansException {
         return this.beanFactory.getBean(beanName);
     }
 
     @Override
-    public void registerBeanDefinition(BeanDefinition bd) {
-        this.beanFactory.registerBeanDefinition(bd);
+    public void registerBean(String beanName, Object obj) {
+        beanFactory.registerBean(beanName, obj);
+    }
+
+    @Override
+    public boolean containsBean(String name) {
+        return beanFactory.containsBean(name);
     }
 }
